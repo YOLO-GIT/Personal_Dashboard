@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Plus } from 'lucide-react';
 import ShortcutCard from './components/ShortcutCards';
 import AddShortcutModal from './components/AddShortCutsModal';
 import AnalyticsView from './components/AnalyticsView';
@@ -6,65 +7,56 @@ import Header from './components/Header';
 import Scratchpad from './components/ScratchPad';
 import Sidebar from './components/SideBar';
 import PersonalHub from './components/PersonalHub';
-
-const DEFAULT_SHORTCUTS = [
-  { id: '1', name: 'YouTube', url: 'https://youtube.com', iconName: 'Play', category: 'Leisure' },
-  { id: '2', name: 'GitHub', url: 'https://github.com', iconName: 'Flame', category: 'Dev' },
-  { id: '3', name: 'LeetCode', url: 'https://leetcode.com', iconName: 'Code2', category: 'Dev' },
-  { id: '4', name: 'Telegram', url: 'https://web.telegram.org', iconName: 'Send', category: 'Social' },
-  { id: '5', name: 'Twitter', url: 'https://twitter.com', iconName: 'Bird', category: 'Social' },
-  { id: '6', name: 'WhatsApp', url: 'https://web.whatsapp.com', iconName: 'MessageSquare', category: 'Social' },
-  { id: '7', name: 'OSi UniMAP', url: 'https://osi.unimap.edu.my', iconName: 'GraduationCap', category: 'Academic' },
-];
+import { loadDashboardData, syncDashboardData } from './api';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [shortcuts, setShortcuts] = useState([]);
 
-  // Load initial shortcuts from localStorage or fallback to defaults
-  const [shortcuts, setShortcuts] = useState(() => {
-    const saved = localStorage.getItem('dashboard_shortcuts');
-    return saved ? JSON.parse(saved) : DEFAULT_SHORTCUTS;
-  });
-
-  // Sync to localStorage
+  // Load server data on boot
   useEffect(() => {
-    localStorage.setItem('dashboard_shortcuts', JSON.stringify(shortcuts));
-  }, [shortcuts]);
+    loadDashboardData().then((data) => {
+      if (data?.shortcuts) {
+        setShortcuts(data.shortcuts);
+      }
+    });
+  }, []);
 
-  // Dynamically extract unique categories for the filter bar
-  const categories = useMemo(() => {
-    const unique = new Set(shortcuts.map(s => s.category));
-    return ['All', ...Array.from(unique)];
-  }, [shortcuts]);
-
-  // Filter shortcuts according to the selected category pill
-  const filteredShortcuts = useMemo(() => {
-    if (selectedCategory === 'All') return shortcuts;
-    return shortcuts.filter(s => s.category === selectedCategory);
-  }, [shortcuts, selectedCategory]);
+  // Sync shortcuts whenever they change
+  const updateShortcuts = (newShortcuts) => {
+    setShortcuts(newShortcuts);
+    syncDashboardData({ shortcuts: newShortcuts });
+  };
 
   const handleAddShortcut = (newShortcut) => {
-    setShortcuts(prev => [...prev, newShortcut]);
+    updateShortcuts([...shortcuts, newShortcut]);
   };
 
   const handleDeleteShortcut = (id) => {
-    setShortcuts(prev => prev.filter(s => s.id !== id));
+    updateShortcuts(shortcuts.filter((s) => s.id !== id));
   };
+
+  const categories = useMemo(() => {
+    const unique = new Set(shortcuts.map((s) => s.category));
+    return ['All', ...Array.from(unique)];
+  }, [shortcuts]);
+
+  const filteredShortcuts = useMemo(() => {
+    if (selectedCategory === 'All') return shortcuts;
+    return shortcuts.filter((s) => s.category === selectedCategory);
+  }, [shortcuts, selectedCategory]);
 
   return (
     <div className="bg-[#121212] text-gray-200 min-h-screen flex font-sans">
-      {/* 1. Dynamic Sidebar (Handles navigation, timer, and stats internally) */}
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* 2. Main View Area */}
       <main className="flex-1 p-10 overflow-y-auto">
         {activeTab === 'home' ? (
           <div>
             <Header />
 
-            {/* Shortcut Grid Section */}
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold text-white">Shortcuts</h3>
               <button
@@ -75,7 +67,6 @@ export default function App() {
               </button>
             </div>
 
-            {/* Filter Pills */}
             <div className="flex flex-wrap gap-2 mb-6">
               {categories.map((cat) => (
                 <button
@@ -91,7 +82,6 @@ export default function App() {
               ))}
             </div>
 
-            {/* Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
               {filteredShortcuts.map((shortcut) => (
                 <ShortcutCard
@@ -103,25 +93,24 @@ export default function App() {
 
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-800 hover:border-emerald-500/50 rounded-2xl transition group text-gray-500 hover:text-emerald-400 min-h-30"
+                className="flex items-center justify-center gap-3 p-4 border-2 border-dashed border-gray-800/80 hover:border-emerald-500/50 rounded-2xl transition-all duration-200 group text-gray-500 hover:text-emerald-400 bg-[#141414]/50 hover:bg-[#161616]"
               >
-                <span className="font-medium text-sm">+ Add New Tile</span>
+                <div className="p-2.5 rounded-xl border border-gray-800 group-hover:border-emerald-500/30 group-hover:bg-emerald-500/10 transition-all">
+                  <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                </div>
+                <span className="font-semibold text-sm">Add New Tile</span>
               </button>
             </div>
 
-            {/* Quick Scratchpad Widget */}
             <Scratchpad />
           </div>
         ) : activeTab === 'personal' ? (
-          <PersonalHub /> // <-- Render Personal Hub View
-        ) : activeTab === 'personal' ? (
-          <PersonalHub /> // <-- Render Personal Hub View
+          <PersonalHub />
         ) : (
           <AnalyticsView />
         )}
       </main>
 
-      {/* 3. Add Shortcut Modal */}
       <AddShortcutModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
