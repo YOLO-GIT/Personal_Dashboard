@@ -1,49 +1,72 @@
 import React, { useState, useEffect } from 'react';
-import { Gamepad2, Globe, UserCheck, Plus, Trash2, ExternalLink, ShieldAlert } from 'lucide-react';
+import { loadDashboardData, syncDashboardData } from '../api';
+import {
+    Gamepad2, Globe, UserCheck, Plus, Trash2, ExternalLink,
+    ShieldAlert, Copy, Check, Search, Star, Sparkles, Code2, ShieldCheck
+} from 'lucide-react';
+
+// Platform Theme Helper for Account Cards
+const getAccountTheme = (platform) => {
+    const lower = platform.toLowerCase();
+    if (lower.includes('discord')) return { gradient: 'from-indigo-500/15 via-indigo-600/5 to-transparent', border: 'hover:border-indigo-500/50', text: 'text-indigo-400', badge: 'bg-indigo-500/10 border-indigo-500/20' };
+    if (lower.includes('steam')) return { gradient: 'from-cyan-500/15 via-blue-600/5 to-transparent', border: 'hover:border-cyan-500/50', text: 'text-cyan-400', badge: 'bg-cyan-500/10 border-cyan-500/20' };
+    if (lower.includes('github')) return { gradient: 'from-purple-500/15 via-slate-600/5 to-transparent', border: 'hover:border-purple-500/50', text: 'text-purple-400', badge: 'bg-purple-500/10 border-purple-500/20' };
+    if (lower.includes('twitter') || lower.includes('x')) return { gradient: 'from-sky-500/15 via-slate-600/5 to-transparent', border: 'hover:border-sky-400/50', text: 'text-sky-400', badge: 'bg-sky-500/10 border-sky-500/20' };
+    if (lower.includes('spotify')) return { gradient: 'from-emerald-500/15 via-green-600/5 to-transparent', border: 'hover:border-emerald-500/50', text: 'text-emerald-400', badge: 'bg-emerald-500/10 border-emerald-500/20' };
+    return { gradient: 'from-emerald-500/10 via-emerald-600/5 to-transparent', border: 'hover:border-emerald-500/50', text: 'text-emerald-400', badge: 'bg-emerald-500/10 border-emerald-500/20' };
+};
+
+// Game Status Theme Helper
+const getGameStatusTheme = (status) => {
+    switch (status) {
+        case 'Completed': return { gradient: 'from-emerald-500/15 via-emerald-600/5 to-transparent', border: 'hover:border-emerald-500/50', badge: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' };
+        case 'Playing': return { gradient: 'from-blue-500/15 via-indigo-600/5 to-transparent', border: 'hover:border-blue-500/50', badge: 'bg-blue-500/15 text-blue-400 border-blue-500/30' };
+        case 'Backlog': return { gradient: 'from-amber-500/15 via-orange-600/5 to-transparent', border: 'hover:border-amber-500/50', badge: 'bg-amber-500/15 text-amber-400 border-amber-500/30' };
+        case 'Abandoned': return { gradient: 'from-red-500/15 via-rose-600/5 to-transparent', border: 'hover:border-red-500/50', badge: 'bg-red-500/15 text-red-400 border-red-500/30' };
+        default: return { gradient: 'from-gray-500/10 to-transparent', border: 'hover:border-gray-500/50', badge: 'bg-gray-500/15 text-gray-400 border-gray-500/30' };
+    }
+};
 
 export default function PersonalHub() {
     const [subTab, setSubTab] = useState('games'); // 'games' | 'projects' | 'accounts'
+    const [searchQuery, setSearchQuery] = useState('');
+    const [copiedId, setCopiedId] = useState(null);
 
-    // --- 1. Games State & LocalStorage ---
-    const [games, setGames] = useState(() => {
-        const saved = localStorage.getItem('dashboard_games');
-        return saved ? JSON.parse(saved) : [
-            { id: '1', title: 'Elden Ring', platform: 'PC', status: 'Completed', rating: '5/5' },
-            { id: '2', title: 'Cyberpunk 2077', platform: 'PC', status: 'Playing', rating: '4/5' },
-        ];
-    });
-    const [newGame, setNewGame] = useState({ title: '', platform: 'PC', status: 'Playing', rating: '5/5' });
+    // States
+    const [games, setGames] = useState([]);
+    const [projects, setProjects] = useState([]);
+    const [accounts, setAccounts] = useState([]);
 
-    // --- 2. Projects State & LocalStorage ---
-    const [projects, setProjects] = useState(() => {
-        const saved = localStorage.getItem('dashboard_projects');
-        return saved ? JSON.parse(saved) : [
-            { id: '1', name: 'My Dashboard', url: 'http://localhost:5173', desc: 'React + Vite personal hub', tech: 'React, Tailwind' },
-        ];
-    });
+    // Form Inputs
+    const [newGame, setNewGame] = useState({ title: '', platform: 'PC', status: 'Playing', rating: '5' });
     const [newProject, setNewProject] = useState({ name: '', url: '', desc: '', tech: '' });
-
-    // --- 3. Accounts State & LocalStorage ---
-    const [accounts, setAccounts] = useState(() => {
-        const saved = localStorage.getItem('dashboard_accounts');
-        return saved ? JSON.parse(saved) : [
-            { id: '1', platform: 'GitHub', identifier: 'username', category: 'Dev' },
-            { id: '2', platform: 'Steam', identifier: 'GamerTag123', category: 'Gaming' },
-        ];
-    });
     const [newAccount, setNewAccount] = useState({ platform: '', identifier: '', category: 'General' });
 
-    // Persistence Syncs
-    useEffect(() => localStorage.setItem('dashboard_games', JSON.stringify(games)), [games]);
-    useEffect(() => localStorage.setItem('dashboard_projects', JSON.stringify(projects)), [projects]);
-    useEffect(() => localStorage.setItem('dashboard_accounts', JSON.stringify(accounts)), [accounts]);
+    // Load Initial Data from Backend
+    useEffect(() => {
+        loadDashboardData().then((data) => {
+            if (data) {
+                if (data.games) setGames(data.games);
+                if (data.projects) setProjects(data.projects);
+                if (data.accounts) setAccounts(data.accounts);
+            }
+        });
+    }, []);
 
-    // Add & Delete Handlers
+    // Handlers & Backend Sync
     const addGame = (e) => {
         e.preventDefault();
         if (!newGame.title) return;
-        setGames([...games, { ...newGame, id: Date.now().toString() }]);
-        setNewGame({ title: '', platform: 'PC', status: 'Playing', rating: '5/5' });
+        const updated = [...games, { ...newGame, id: Date.now().toString() }];
+        setGames(updated);
+        syncDashboardData({ games: updated });
+        setNewGame({ title: '', platform: 'PC', status: 'Playing', rating: '5' });
+    };
+
+    const deleteGame = (id) => {
+        const updated = games.filter(g => g.id !== id);
+        setGames(updated);
+        syncDashboardData({ games: updated });
     };
 
     const addProject = (e) => {
@@ -51,117 +74,251 @@ export default function PersonalHub() {
         if (!newProject.name || !newProject.url) return;
         let url = newProject.url;
         if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
-        setProjects([...projects, { ...newProject, url, id: Date.now().toString() }]);
+        const updated = [...projects, { ...newProject, url, id: Date.now().toString() }];
+        setProjects(updated);
+        syncDashboardData({ projects: updated });
         setNewProject({ name: '', url: '', desc: '', tech: '' });
+    };
+
+    const deleteProject = (id) => {
+        const updated = projects.filter(p => p.id !== id);
+        setProjects(updated);
+        syncDashboardData({ projects: updated });
     };
 
     const addAccount = (e) => {
         e.preventDefault();
         if (!newAccount.platform || !newAccount.identifier) return;
-        setAccounts([...accounts, { ...newAccount, id: Date.now().toString() }]);
+        const updated = [...accounts, { ...newAccount, id: Date.now().toString() }];
+        setAccounts(updated);
+        syncDashboardData({ accounts: updated });
         setNewAccount({ platform: '', identifier: '', category: 'General' });
     };
 
+    const deleteAccount = (id) => {
+        const updated = accounts.filter(a => a.id !== id);
+        setAccounts(updated);
+        syncDashboardData({ accounts: updated });
+    };
+
+    const handleCopy = (text, id) => {
+        navigator.clipboard.writeText(text);
+        setCopiedId(id);
+        setTimeout(() => setCopiedId(null), 2000);
+    };
+
+    const getFaviconUrl = (url) => {
+        try {
+            const domain = new URL(url).hostname;
+            return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+        } catch {
+            return null;
+        }
+    };
+
+    // Filtered Lists
+    const filteredGames = games.filter(g => g.title.toLowerCase().includes(searchQuery.toLowerCase()));
+    const filteredProjects = projects.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    const filteredAccounts = accounts.filter(a => a.platform.toLowerCase().includes(searchQuery.toLowerCase()) || a.identifier.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    // Derived Stats
+    const completedGamesCount = games.filter(g => g.status === 'Completed').length;
+
     return (
-        <div className="space-y-6">
-            {/* Page Title & Sub-Tab Navigation */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-800 pb-6">
-                <div>
-                    <h2 className="text-3xl font-bold text-white">Personal Hub</h2>
-                    <p className="text-sm text-gray-400 mt-1">Manage your games log, web pages, and personal profiles.</p>
+        <div className="space-y-8">
+            {/* 1. HERO STATS BANNER */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-linear-to-br from-emerald-950/40 via-[#161616] to-[#121212] border border-emerald-900/40 rounded-2xl p-4 flex items-center gap-4 shadow-lg">
+                    <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 shrink-0">
+                        <Gamepad2 className="w-6 h-6" />
+                    </div>
+                    <div>
+                        <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Gaming HQ</span>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-extrabold text-white">{games.length}</span>
+                            <span className="text-xs text-gray-400">Logged ({completedGamesCount} Beat)</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="flex bg-[#1E1E1E] p-1 rounded-xl border border-gray-800 self-start md:self-auto">
-                    <button
-                        onClick={() => setSubTab('games')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition ${subTab === 'games' ? 'bg-emerald-600 text-white' : 'text-gray-400 hover:text-white'
-                            }`}
-                    >
-                        <Gamepad2 className="w-4 h-4" /> Games Played
-                    </button>
-                    <button
-                        onClick={() => setSubTab('projects')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition ${subTab === 'projects' ? 'bg-emerald-600 text-white' : 'text-gray-400 hover:text-white'
-                            }`}
-                    >
-                        <Globe className="w-4 h-4" /> Web Pages
-                    </button>
-                    <button
-                        onClick={() => setSubTab('accounts')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition ${subTab === 'accounts' ? 'bg-emerald-600 text-white' : 'text-gray-400 hover:text-white'
-                            }`}
-                    >
-                        <UserCheck className="w-4 h-4" /> Account List
-                    </button>
+                <div className="bg-linear-to-br from-blue-950/40 via-[#161616] to-[#121212] border border-blue-900/40 rounded-2xl p-4 flex items-center gap-4 shadow-lg">
+                    <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl text-blue-400 shrink-0">
+                        <Globe className="w-6 h-6" />
+                    </div>
+                    <div>
+                        <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Web Deployment</span>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-extrabold text-white">{projects.length}</span>
+                            <span className="text-xs text-gray-400">Live Apps Showcase</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-linear-to-br from-purple-950/40 via-[#161616] to-[#121212] border border-purple-900/40 rounded-2xl p-4 flex items-center gap-4 shadow-lg">
+                    <div className="p-3 bg-purple-500/10 border border-purple-500/20 rounded-xl text-purple-400 shrink-0">
+                        <UserCheck className="w-6 h-6" />
+                    </div>
+                    <div>
+                        <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Account Vault</span>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-extrabold text-white">{accounts.length}</span>
+                            <span className="text-xs text-gray-400">Profiles Linked</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            {/* SUB-TAB 1: GAMES PLAYED */}
-            {subTab === 'games' && (
-                <div className="space-y-6">
-                    <form onSubmit={addGame} className="bg-[#1E1E1E] border border-gray-800 rounded-2xl p-4 flex flex-wrap gap-3 items-center">
+            {/* 2. SUB-TAB BAR & SEARCH */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-800/80 pb-5">
+                <div className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-emerald-400" />
+                    <h2 className="text-2xl font-bold text-white tracking-tight">Personal Directory</h2>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                    {/* Search Box */}
+                    <div className="relative">
+                        <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-500" />
                         <input
                             type="text"
-                            placeholder="Game Title"
+                            placeholder="Search directory..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="bg-[#161616] border border-gray-800 text-xs text-white pl-9 pr-3 py-2 rounded-xl focus:outline-none focus:border-emerald-500 w-48 shadow-inner"
+                        />
+                    </div>
+
+                    {/* Sub-Tabs Selector */}
+                    <div className="flex bg-[#161616] p-1 rounded-xl border border-gray-800/80 shadow-inner">
+                        <button
+                            onClick={() => setSubTab('games')}
+                            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${subTab === 'games' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-400 hover:text-white'
+                                }`}
+                        >
+                            <Gamepad2 className="w-3.5 h-3.5" /> Games ({games.length})
+                        </button>
+                        <button
+                            onClick={() => setSubTab('projects')}
+                            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${subTab === 'projects' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-400 hover:text-white'
+                                }`}
+                        >
+                            <Globe className="w-3.5 h-3.5" /> Web Pages ({projects.length})
+                        </button>
+                        <button
+                            onClick={() => setSubTab('accounts')}
+                            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${subTab === 'accounts' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-400 hover:text-white'
+                                }`}
+                        >
+                            <UserCheck className="w-3.5 h-3.5" /> Accounts ({accounts.length})
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* --- SUB-TAB 1: GAMES PLAYED --- */}
+            {subTab === 'games' && (
+                <div className="space-y-6">
+                    <form onSubmit={addGame} className="bg-[#161616] border border-gray-800/80 rounded-2xl p-4 flex flex-wrap gap-3 items-center shadow-lg">
+                        <input
+                            type="text"
+                            placeholder="Game Title (e.g., Elden Ring)"
                             value={newGame.title}
                             onChange={(e) => setNewGame({ ...newGame, title: e.target.value })}
-                            className="bg-[#121212] border border-gray-800 px-3 py-2 rounded-lg text-sm text-white flex-1 min-w-45 focus:outline-none focus:border-emerald-500"
+                            className="bg-[#101010] border border-gray-800 px-3.5 py-2 rounded-xl text-xs text-white flex-1 min-w-50 focus:outline-none focus:border-emerald-500"
                             required
                         />
                         <input
                             type="text"
-                            placeholder="Platform (PC, PS5, Switch)"
+                            placeholder="Platform (PC, PS5)"
                             value={newGame.platform}
                             onChange={(e) => setNewGame({ ...newGame, platform: e.target.value })}
-                            className="bg-[#121212] border border-gray-800 px-3 py-2 rounded-lg text-sm text-white w-32 focus:outline-none focus:border-emerald-500"
+                            className="bg-[#101010] border border-gray-800 px-3.5 py-2 rounded-xl text-xs text-white w-28 focus:outline-none focus:border-emerald-500"
                         />
                         <select
                             value={newGame.status}
                             onChange={(e) => setNewGame({ ...newGame, status: e.target.value })}
-                            className="bg-[#121212] border border-gray-800 px-3 py-2 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500"
+                            className="bg-[#101010] border border-gray-800 px-3.5 py-2 rounded-xl text-xs text-white focus:outline-none focus:border-emerald-500"
                         >
                             <option value="Playing">Playing</option>
                             <option value="Completed">Completed</option>
                             <option value="Backlog">Backlog</option>
                             <option value="Abandoned">Abandoned</option>
                         </select>
-                        <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium flex items-center gap-1">
+                        <select
+                            value={newGame.rating}
+                            onChange={(e) => setNewGame({ ...newGame, rating: e.target.value })}
+                            className="bg-[#101010] border border-gray-800 px-3.5 py-2 rounded-xl text-xs text-white focus:outline-none focus:border-emerald-500"
+                        >
+                            <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+                            <option value="4">⭐⭐⭐⭐ (4/5)</option>
+                            <option value="3">⭐⭐⭐ (3/5)</option>
+                            <option value="2">⭐⭐ (2/5)</option>
+                            <option value="1">⭐ (1/5)</option>
+                        </select>
+                        <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-1 transition shadow-lg shadow-emerald-950/50">
                             <Plus className="w-4 h-4" /> Add Game
                         </button>
                     </form>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {games.map((g) => (
-                            <div key={g.id} className="bg-[#1E1E1E] border border-gray-800 rounded-2xl p-4 flex justify-between items-start">
-                                <div>
-                                    <h4 className="font-bold text-white text-base">{g.title}</h4>
-                                    <div className="flex gap-2 items-center mt-2">
-                                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-gray-800 text-gray-300">{g.platform}</span>
-                                        <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded ${g.status === 'Completed' ? 'bg-emerald-950 text-emerald-400' :
-                                            g.status === 'Playing' ? 'bg-blue-950 text-blue-400' : 'bg-amber-950 text-amber-400'
-                                            }`}>{g.status}</span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {filteredGames.map((g) => {
+                            const theme = getGameStatusTheme(g.status);
+                            const score = Number(g.rating) || 5;
+
+                            return (
+                                <div
+                                    key={g.id}
+                                    className={`bg-[#161616] bg-linear-to-r ${theme.gradient} border border-gray-800/80 ${theme.border} rounded-2xl p-5 flex justify-between items-start transition-all duration-300 hover:-translate-y-1 shadow-lg group relative overflow-hidden`}
+                                >
+                                    <div className="space-y-3 z-10">
+                                        <div>
+                                            <h4 className="font-bold text-white text-lg tracking-wide group-hover:text-white transition">{g.title}</h4>
+                                            <div className="flex gap-2 items-center mt-2">
+                                                <span className="text-[10px] font-mono uppercase font-bold px-2 py-0.5 rounded-md bg-gray-800/80 border border-gray-700/50 text-gray-300">
+                                                    {g.platform}
+                                                </span>
+                                                <span className={`text-[10px] font-mono uppercase font-bold px-2 py-0.5 rounded-md border ${theme.badge}`}>
+                                                    {g.status}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {/* Vector Star Rating Visualizer */}
+                                        <div className="flex items-center gap-1 pt-1">
+                                            {Array.from({ length: 5 }).map((_, i) => (
+                                                <Star
+                                                    key={i}
+                                                    className={`w-3.5 h-3.5 ${i < score ? 'fill-amber-400 text-amber-400' : 'text-gray-800'}`}
+                                                />
+                                            ))}
+                                        </div>
                                     </div>
+
+                                    <button
+                                        onClick={() => deleteGame(g.id)}
+                                        className="text-gray-600 hover:text-red-400 transition p-1.5 rounded-lg hover:bg-red-950/40 z-10"
+                                        title="Delete Game"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
                                 </div>
-                                <button onClick={() => setGames(games.filter(x => x.id !== g.id))} className="text-gray-500 hover:text-red-400">
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             )}
 
-            {/* SUB-TAB 2: WEB PAGES / PROJECTS */}
+            {/* --- SUB-TAB 2: WEB PAGES SHOWCASE --- */}
             {subTab === 'projects' && (
                 <div className="space-y-6">
-                    <form onSubmit={addProject} className="bg-[#1E1E1E] border border-gray-800 rounded-2xl p-4 space-y-3">
+                    <form onSubmit={addProject} className="bg-[#161616] border border-gray-800/80 rounded-2xl p-4 space-y-3 shadow-lg">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <input
                                 type="text"
-                                placeholder="Project Name"
+                                placeholder="Project Name (e.g., Portfolio Site)"
                                 value={newProject.name}
                                 onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
-                                className="bg-[#121212] border border-gray-800 px-3 py-2 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500"
+                                className="bg-[#101010] border border-gray-800 px-3.5 py-2 rounded-xl text-xs text-white focus:outline-none focus:border-emerald-500"
                                 required
                             />
                             <input
@@ -169,7 +326,7 @@ export default function PersonalHub() {
                                 placeholder="URL (e.g. my-app.vercel.app)"
                                 value={newProject.url}
                                 onChange={(e) => setNewProject({ ...newProject, url: e.target.value })}
-                                className="bg-[#121212] border border-gray-800 px-3 py-2 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500"
+                                className="bg-[#101010] border border-gray-800 px-3.5 py-2 rounded-xl text-xs text-white focus:outline-none focus:border-emerald-500"
                                 required
                             />
                         </div>
@@ -179,93 +336,155 @@ export default function PersonalHub() {
                                 placeholder="Short Description"
                                 value={newProject.desc}
                                 onChange={(e) => setNewProject({ ...newProject, desc: e.target.value })}
-                                className="bg-[#121212] border border-gray-800 px-3 py-2 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500"
+                                className="bg-[#101010] border border-gray-800 px-3.5 py-2 rounded-xl text-xs text-white focus:outline-none focus:border-emerald-500"
                             />
                             <input
                                 type="text"
                                 placeholder="Tech Stack (e.g. React, Node.js)"
                                 value={newProject.tech}
                                 onChange={(e) => setNewProject({ ...newProject, tech: e.target.value })}
-                                className="bg-[#121212] border border-gray-800 px-3 py-2 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500"
+                                className="bg-[#101010] border border-gray-800 px-3.5 py-2 rounded-xl text-xs text-white focus:outline-none focus:border-emerald-500"
                             />
                         </div>
-                        <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium flex items-center gap-1">
-                            <Plus className="w-4 h-4" /> Add Web Project
+                        <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-1 transition shadow-lg shadow-emerald-950/50">
+                            <Plus className="w-4 h-4" /> Save Web Page
                         </button>
                     </form>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {projects.map((p) => (
-                            <div key={p.id} className="bg-[#1E1E1E] border border-gray-800 rounded-2xl p-5 flex justify-between items-start">
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-2">
-                                        <h4 className="font-bold text-white text-lg">{p.name}</h4>
-                                        <a href={p.url} target="_blank" rel="noreferrer" className="text-emerald-400 hover:text-emerald-300">
-                                            <ExternalLink className="w-4 h-4" />
-                                        </a>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        {filteredProjects.map((p) => {
+                            const favicon = getFaviconUrl(p.url);
+                            return (
+                                <div
+                                    key={p.id}
+                                    className="bg-[#161616] bg-linear-to-r from-blue-500/10 via-indigo-600/5 to-transparent border border-gray-800/80 hover:border-blue-500/50 rounded-2xl p-5 flex justify-between items-start transition-all duration-300 hover:-translate-y-1 shadow-lg group"
+                                >
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            {/* Favicon Container */}
+                                            <div className="p-2 bg-[#101010] border border-gray-800 rounded-xl group-hover:scale-110 transition-transform shrink-0">
+                                                {favicon ? (
+                                                    <img src={favicon} alt="" className="w-5 h-5 rounded" onError={(e) => e.target.style.display = 'none'} />
+                                                ) : (
+                                                    <Code2 className="w-5 h-5 text-blue-400" />
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <h4 className="font-bold text-white text-lg group-hover:text-blue-400 transition">{p.name}</h4>
+                                                    <a href={p.url} target="_blank" rel="noreferrer" className="text-gray-500 hover:text-blue-400 transition">
+                                                        <ExternalLink className="w-4 h-4" />
+                                                    </a>
+                                                </div>
+                                                <span className="text-[10px] text-gray-500 font-mono">{p.url}</span>
+                                            </div>
+                                        </div>
+
+                                        {p.desc && <p className="text-xs text-gray-400 leading-relaxed">{p.desc}</p>}
+
+                                        {p.tech && (
+                                            <div className="pt-1">
+                                                <span className="inline-block text-[10px] font-mono bg-blue-950/60 text-blue-400 border border-blue-800/50 px-2.5 py-0.5 rounded-lg shadow-inner">
+                                                    {p.tech}
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
-                                    {p.desc && <p className="text-xs text-gray-400">{p.desc}</p>}
-                                    {p.tech && <span className="inline-block text-[10px] font-mono bg-gray-800 text-gray-300 px-2 py-0.5 rounded">{p.tech}</span>}
+
+                                    <button
+                                        onClick={() => deleteProject(p.id)}
+                                        className="text-gray-600 hover:text-red-400 transition p-1.5 rounded-lg hover:bg-red-950/40"
+                                        title="Delete Web Page"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
                                 </div>
-                                <button onClick={() => setProjects(projects.filter(x => x.id !== p.id))} className="text-gray-500 hover:text-red-400">
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             )}
 
-            {/* SUB-TAB 3: ACCOUNTS DIRECTORY */}
+            {/* --- SUB-TAB 3: ACCOUNTS DIRECTORY --- */}
             {subTab === 'accounts' && (
                 <div className="space-y-6">
-                    <div className="bg-amber-950/20 border border-amber-800/40 rounded-xl p-3 flex items-center gap-2 text-amber-400 text-xs">
-                        <ShieldAlert className="w-4 h-4 shrink-0" />
-                        <span>Note: Keep sensitive passwords in a password manager. Use this only for tracking usernames, emails, or account IDs!</span>
+                    <div className="bg-amber-950/20 border border-amber-800/40 rounded-2xl p-3.5 flex items-center gap-3 text-amber-400 text-xs shadow-inner">
+                        <ShieldCheck className="w-5 h-5 shrink-0 text-amber-400" />
+                        <span>Store public IDs, gamer tags, and dev usernames safely here. Keep passwords in a password manager!</span>
                     </div>
 
-                    <form onSubmit={addAccount} className="bg-[#1E1E1E] border border-gray-800 rounded-2xl p-4 flex flex-wrap gap-3 items-center">
+                    <form onSubmit={addAccount} className="bg-[#161616] border border-gray-800/80 rounded-2xl p-4 flex flex-wrap gap-3 items-center shadow-lg">
                         <input
                             type="text"
-                            placeholder="Service/Platform (e.g. Steam, Discord)"
+                            placeholder="Platform (e.g. Discord, Steam)"
                             value={newAccount.platform}
                             onChange={(e) => setNewAccount({ ...newAccount, platform: e.target.value })}
-                            className="bg-[#121212] border border-gray-800 px-3 py-2 rounded-lg text-sm text-white flex-1 min-w-45 focus:outline-none focus:border-emerald-500"
+                            className="bg-[#101010] border border-gray-800 px-3.5 py-2 rounded-xl text-xs text-white flex-1 min-w-40 focus:outline-none focus:border-emerald-500"
                             required
                         />
                         <input
                             type="text"
-                            placeholder="Username / Email / Tag"
+                            placeholder="Username / Tag / Email"
                             value={newAccount.identifier}
                             onChange={(e) => setNewAccount({ ...newAccount, identifier: e.target.value })}
-                            className="bg-[#121212] border border-gray-800 px-3 py-2 rounded-lg text-sm text-white flex-1 min-w-45 focus:outline-none focus:border-emerald-500"
+                            className="bg-[#101010] border border-gray-800 px-3.5 py-2 rounded-xl text-xs text-white flex-1 min-w-45 focus:outline-none focus:border-emerald-500"
                             required
                         />
                         <input
                             type="text"
-                            placeholder="Category (Dev, Gaming, Social)"
+                            placeholder="Category (Gaming, Dev)"
                             value={newAccount.category}
                             onChange={(e) => setNewAccount({ ...newAccount, category: e.target.value })}
-                            className="bg-[#121212] border border-gray-800 px-3 py-2 rounded-lg text-sm text-white w-36 focus:outline-none focus:border-emerald-500"
+                            className="bg-[#101010] border border-gray-800 px-3.5 py-2 rounded-xl text-xs text-white w-32 focus:outline-none focus:border-emerald-500"
                         />
-                        <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium flex items-center gap-1">
-                            <Plus className="w-4 h-4" /> Add Account
+                        <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-1 transition shadow-lg shadow-emerald-950/50">
+                            <Plus className="w-4 h-4" /> Save Account
                         </button>
                     </form>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {accounts.map((a) => (
-                            <div key={a.id} className="bg-[#1E1E1E] border border-gray-800 rounded-2xl p-4 flex justify-between items-center">
-                                <div>
-                                    <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">{a.category}</span>
-                                    <h4 className="font-bold text-white text-base mt-0.5">{a.platform}</h4>
-                                    <p className="text-xs text-gray-400 font-mono mt-1">{a.identifier}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {filteredAccounts.map((a) => {
+                            const theme = getAccountTheme(a.platform);
+
+                            return (
+                                <div
+                                    key={a.id}
+                                    className={`bg-[#161616] bg-linear-to-r ${theme.gradient} border border-gray-800/80 ${theme.border} rounded-2xl p-5 flex justify-between items-center transition-all duration-300 hover:-translate-y-1 shadow-lg group`}
+                                >
+                                    <div className="space-y-1.5">
+                                        <span className="text-[9px] uppercase font-mono font-bold text-gray-400 tracking-widest">{a.category}</span>
+                                        <h4 className="font-bold text-white text-lg tracking-wide group-hover:text-white transition">{a.platform}</h4>
+
+                                        {/* Copy Handle Pill */}
+                                        <div className="flex items-center gap-2 pt-1">
+                                            <span className="text-xs text-gray-200 font-mono bg-[#101010] px-3 py-1 rounded-lg border border-gray-800 shadow-inner">
+                                                {a.identifier}
+                                            </span>
+                                            <button
+                                                onClick={() => handleCopy(a.identifier, a.id)}
+                                                className="text-gray-500 hover:text-emerald-400 transition p-1"
+                                                title="Copy to clipboard"
+                                            >
+                                                {copiedId === a.id ? (
+                                                    <Check className="w-4 h-4 text-emerald-400 animate-bounce" />
+                                                ) : (
+                                                    <Copy className="w-4 h-4" />
+                                                )}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        onClick={() => deleteAccount(a.id)}
+                                        className="text-gray-600 hover:text-red-400 transition p-1.5 rounded-lg hover:bg-red-950/40"
+                                        title="Delete Account"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
                                 </div>
-                                <button onClick={() => setAccounts(accounts.filter(x => x.id !== a.id))} className="text-gray-500 hover:text-red-400">
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             )}
