@@ -98,129 +98,129 @@ export default function Sidebar({ activeTab, setActiveTab }) {
             ))}
 
             {/* Subtle Gradient Mask for Text Contrast */}
-            <div className="absolute inset-0 bg-linear-to-b from-[#0a0a0a]/80 via-[#0a0a0a]/50 to-[#0a0a0a]/85 pointer-events-none" />
-            <div className="space-y-6">
+            <div className="absolute inset-0 bg-linear-to-b from-[#0a0a0a]/85 via-[#0a0a0a]/60 to-[#0a0a0a]/90 pointer-events-none" />
+
+            {/* SCROLLABLE MAIN CONTENT AREA */}
+            <div className="relative z-10 flex-1 flex flex-col min-h-0 space-y-3 overflow-y-auto my_scroll pr-0.5">
                 {/* Brand / Header Link */}
                 <a
-                    href="https://github.com/your-username/your-dashboard-repo" // 👈 Replace with your GitHub Repo URL
+                    href="https://github.com/your-username/your-dashboard-repo"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="relative group flex items-center px-5 py-2.5 bg-[#161616] border border-gray-800/80 hover:border-emerald-500/50 rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(16,185,129,0.25)] hover:-translate-y-0.5 active:translate-y-0 cursor-pointer overflow-hidden"
+                    className="relative group flex items-center px-4 py-2.5 bg-[#161616] border border-gray-800/80 hover:border-emerald-500/50 rounded-xl transition-all duration-300 active:translate-y-0 cursor-pointer overflow-hidden shrink-0"
                     title="View source on GitHub"
                 >
                     <img
                         src="/dashy.gif"
                         alt=""
-                        className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-150 group-hover:scale-105 transition-all duration-500 pointer-events-none"
+                        className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-90 transition-all duration-500 pointer-events-none"
                         onError={(e) => {
                             e.target.style.display = "none";
                         }}
                     />
 
-                    <div className="absolute inset-0 bg-linear-to-r from-[#161616]/90 via-[#161616]/70 to-[#161616]/90 pointer-events-none" />
-
-                    <div className="relative z-10 flex items-center gap-3">
-                        <h1 className="text-2xl font-bold text-white tracking-wide group-hover:text-emerald-400 transition-colors drop-shadow-md">
+                    <div className="relative z-10 flex items-center justify-between w-full">
+                        <h1 className="text-xl font-bold text-white tracking-wide group-hover:text-emerald-400 transition-colors drop-shadow-md">
                             Dashboard
                         </h1>
 
                         <div className="p-1.5 rounded-lg bg-gray-800/60 group-hover:bg-emerald-500/20 text-gray-300 group-hover:text-emerald-400 border border-gray-700/50 group-hover:border-emerald-500/40 transition-all duration-300 group-hover:rotate-12 backdrop-blur-sm">
-                            <Code2 className="w-4 h-4" />
+                            <Code2 className="w-3.5 h-3.5" />
                         </div>
                     </div>
                 </a>
 
                 {/* Navigation Links */}
-                <nav className="space-y-1.5 bg-[#121212]/60 backdrop-blur-md border border-white/10 p-1.5 rounded-2xl">
+                <nav className="space-y-1 bg-[#121212]/60 backdrop-blur-md border border-white/10 p-1 rounded-xl shrink-0">
                     <button
                         onClick={() => setActiveTab("home")}
-                        className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === "home"
+                        className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === "home"
                             ? "bg-emerald-600/90 text-white shadow-md shadow-emerald-950/50 border border-emerald-500/30"
                             : "text-gray-400 hover:text-white hover:bg-white/5"
                             }`}
                     >
-                        <Home className="w-4 h-4" /> Home
+                        <Home className="w-3.5 h-3.5" /> Home
                     </button>
                     <button
                         onClick={() => setActiveTab("personal")}
-                        className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === "personal"
+                        className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === "personal"
                             ? "bg-emerald-600/90 text-white shadow-md shadow-emerald-950/50 border border-emerald-500/30"
                             : "text-gray-400 hover:text-white hover:bg-white/5"
                             }`}
                     >
-                        <User className="w-4 h-4" /> Personal
+                        <User className="w-3.5 h-3.5" /> Personal
                     </button>
                     <button
                         onClick={() => setActiveTab("analytics")}
-                        className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === "analytics"
+                        className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === "analytics"
                             ? "bg-emerald-600/90 text-white shadow-md shadow-emerald-950/50 border border-emerald-500/30"
                             : "text-gray-400 hover:text-white hover:bg-white/5"
                             }`}
                     >
-                        <BarChart3 className="w-4 h-4" /> Analytics
+                        <BarChart3 className="w-3.5 h-3.5" /> Analytics
                     </button>
                 </nav>
 
                 {/* Widgets Container */}
-                <div className="space-y-3.5 pt-1">
+                <div className="space-y-2.5 pt-0.5">
                     {/* Pomodoro Timer Widget */}
-                    <div className="bg-[#121212]/70 backdrop-blur-md border border-white/10 rounded-2xl p-4 space-y-3 shadow-lg">
-                        <div className="flex items-center justify-between text-xs text-gray-400 font-medium">
-                            <span className="flex items-center gap-1.5 text-emerald-400 font-bold uppercase tracking-wider text-[10px]">
-                                <Timer className="w-3.5 h-3.5" />{" "}
+                    <div className="bg-[#121212]/70 backdrop-blur-md border border-white/10 rounded-xl p-3 space-y-2 shadow-lg">
+                        <div className="flex items-center justify-between text-[11px] text-gray-400 font-medium">
+                            <span className="flex items-center gap-1.5 text-emerald-400 font-bold uppercase tracking-wider text-[9px]">
+                                <Timer className="w-3 h-3" />{" "}
                                 {mode === "work" ? "Focus Session" : "Break Time"}
                             </span>
-                            <span className="text-[10px] text-gray-400 font-mono">
+                            <span className="text-[9px] text-gray-400 font-mono">
                                 {mode === "work" ? "25m" : "5m"}
                             </span>
                         </div>
 
-                        <div className="text-center py-0.5">
-                            <div className="text-3xl font-mono font-extrabold text-white tracking-widest drop-shadow-sm">
+                        <div className="text-center py-0">
+                            <div className="text-2xl font-mono font-extrabold text-white tracking-widest drop-shadow-sm">
                                 {formatTime(timeLeft)}
                             </div>
                         </div>
 
-                        <div className="flex justify-center gap-2">
+                        <div className="flex justify-center gap-1.5">
                             <button
                                 onClick={toggleTimer}
-                                className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition ${isRunning
+                                className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[11px] font-bold transition ${isRunning
                                     ? "bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 border border-amber-500/30"
                                     : "bg-emerald-600/90 text-white hover:bg-emerald-500 border border-emerald-500/30 shadow-md"
                                     }`}
                             >
                                 {isRunning ? (
-                                    <Pause className="w-3.5 h-3.5" />
+                                    <Pause className="w-3 h-3" />
                                 ) : (
-                                    <Play className="w-3.5 h-3.5" />
+                                    <Play className="w-3 h-3" />
                                 )}
                                 {isRunning ? "Pause" : "Start"}
                             </button>
                             <button
                                 onClick={resetTimer}
-                                className="p-2 text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition"
+                                className="p-1.5 text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg border border-white/5 transition"
                                 title="Reset Timer"
                             >
-                                <RotateCcw className="w-3.5 h-3.5" />
+                                <RotateCcw className="w-3 h-3" />
                             </button>
                         </div>
                     </div>
 
                     {/* Ambient Sound Player */}
-                    <div className="bg-[#121212]/70 backdrop-blur-md border border-white/10 rounded-2xl p-1 shadow-lg">
+                    <div className="bg-[#121212]/70 backdrop-blur-md border border-white/10 rounded-xl p-1 shadow-lg">
                         <AmbientPlayer />
                     </div>
 
                     {/* Today's Activity Badge */}
-                    <div className="bg-[#121212]/70 backdrop-blur-md border border-white/10 rounded-2xl p-3.5 flex items-center gap-3 shadow-lg">
-                        <div className="p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 shrink-0">
-                            <Activity className="w-4 h-4" />
+                    <div className="bg-[#121212]/70 backdrop-blur-md border border-white/10 rounded-xl p-2.5 flex items-center gap-2.5 shadow-lg">
+                        <div className="p-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-400 shrink-0">
+                            <Activity className="w-3.5 h-3.5" />
                         </div>
                         <div>
-                            <p className="text-[9px] text-gray-400 uppercase font-bold tracking-wider">
+                            <p className="text-[8px] text-gray-400 uppercase font-bold tracking-wider">
                                 Today's Activity
                             </p>
-                            <p className="text-xs font-bold text-white mt-0.5">
+                            <p className="text-xs font-bold text-white">
                                 {todayClicks} {todayClicks === 1 ? "click" : "clicks"}
                             </p>
                         </div>
@@ -228,8 +228,9 @@ export default function Sidebar({ activeTab, setActiveTab }) {
                 </div>
             </div>
 
-            <div className="relative z-10">
-                <div className="relative overflow-hidden bg-[#161616] border border-gray-800/80 rounded-2xl p-3.5 space-y-2 shadow-lg group">
+            {/* FIXED FOOTER SYSTEM WIDGET */}
+            <div className="relative z-10 pt-2 shrink-0">
+                <div className="relative overflow-hidden bg-[#161616] border border-gray-800/80 rounded-xl p-3 space-y-1.5 shadow-lg group">
                     {/* Animated Wave / Pulse GIF in Bottom Card */}
                     <img
                         src="/dashy_3.gif"
@@ -239,19 +240,19 @@ export default function Sidebar({ activeTab, setActiveTab }) {
                     />
 
                     <div className="relative z-10 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
                             <span className="relative flex h-2 w-2">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                             </span>
-                            <span className="text-xs font-mono font-bold text-gray-200">
+                            <span className="text-[11px] font-mono font-bold text-gray-200">
                                 System Normal
                             </span>
                         </div>
-                        <Wifi className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+                        <Wifi className="w-3 h-3 text-emerald-400 animate-pulse" />
                     </div>
 
-                    <div className="relative z-10 pt-1 border-t border-gray-800/60 flex justify-between items-center text-[10px] text-gray-400 font-mono">
+                    <div className="relative z-10 pt-1 border-t border-gray-800/60 flex justify-between items-center text-[9px] text-gray-400 font-mono">
                         <span>Port: 5000</span>
                         <span className="text-emerald-400/80 font-bold">Online</span>
                     </div>

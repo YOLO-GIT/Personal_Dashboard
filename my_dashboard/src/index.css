@@ -19,7 +19,7 @@
         /* Firefox */
     }
 
-    .mux_part::-webkit-scrollbar {
+    .my_scroll::-webkit-scrollbar {
         display: none;
     }
 }

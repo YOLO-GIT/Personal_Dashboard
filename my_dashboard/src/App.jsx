@@ -49,7 +49,7 @@ export default function App() {
   }, [shortcuts, selectedCategory]);
 
   return (
-    <div className="bg-[#121212] text-gray-200 min-h-screen flex font-sans">
+    <div className="flex h-screen w-screen overflow-hidden bg-black text-white">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <main className="flex-1 p-10 overflow-y-auto">
