@@ -1,0 +1,66 @@
+{
+  "shortcuts": [
+    {
+      "id": "1",
+      "name": "YouTube",
+      "url": "https://youtube.com",
+      "iconName": "Play",
+      "category": "Leisure"
+    },
+    {
+      "id": "2",
+      "name": "GitHub",
+      "url": "https://github.com",
+      "iconName": "Flame",
+      "category": "Dev"
+    },
+    {
+      "id": "3",
+      "name": "LeetCode",
+      "url": "https://leetcode.com",
+      "iconName": "Code2",
+      "category": "Dev"
+    },
+    {
+      "id": "4",
+      "name": "Telegram",
+      "url": "https://web.telegram.org",
+      "iconName": "Send",
+      "category": "Social"
+    },
+    {
+      "id": "5",
+      "name": "Twitter",
+      "url": "https://twitter.com",
+      "iconName": "Bird",
+      "category": "Social"
+    },
+    {
+      "id": "6",
+      "name": "WhatsApp",
+      "url": "https://web.whatsapp.com",
+      "iconName": "MessageSquare",
+      "category": "Social"
+    },
+    {
+      "id": "7",
+      "name": "OSi UniMAP",
+      "url": "https://osi.unimap.edu.my",
+      "iconName": "GraduationCap",
+      "category": "Academic"
+    }
+  ],
+  "scratchpad": "",
+  "analytics": [],
+  "games": [
+    {
+      "id": "1",
+      "title": "Elden Ring",
+      "platform": "PC",
+      "status": "Completed",
+      "rating": "5/5"
+    }
+  ],
+  "projects": [],
+  "accounts": []
+}
