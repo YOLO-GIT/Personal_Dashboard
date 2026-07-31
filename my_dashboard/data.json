@@ -48,19 +48,291 @@
       "url": "https://osi.unimap.edu.my",
       "iconName": "GraduationCap",
       "category": "Academic"
+    },
+    {
+      "id": "1785489024188",
+      "name": "Random Image",
+      "url": "https://www.generatormix.com/random-image-generator",
+      "category": "Tools",
+      "iconName": "Tv"
+    },
+    {
+      "id": "1785489063115",
+      "name": "Font Template",
+      "url": "https://fontawesome.com/v4/icons/",
+      "category": "Tools",
+      "iconName": "Globe"
+    },
+    {
+      "id": "1785489086335",
+      "name": "Shopee",
+      "url": "https://shopee.com.my",
+      "category": "Leisure",
+      "iconName": "ShoppingBag"
+    },
+    {
+      "id": "1785489120913",
+      "name": "Gradients Template",
+      "url": "https://uigradients.com",
+      "category": "Tools",
+      "iconName": "Globe"
+    },
+    {
+      "id": "1785489194124",
+      "name": "Sphinx For Doc",
+      "url": "https://www.sphinx-doc.org/en/master/index.html",
+      "category": "Tools",
+      "iconName": "Globe"
+    },
+    {
+      "id": "1785489218459",
+      "name": "License Example",
+      "url": "https://choosealicense.com/licenses/mit/#",
+      "category": "Dev",
+      "iconName": "Code2"
+    },
+    {
+      "id": "1785489402984",
+      "name": "Regex Purposes",
+      "url": "https://regexlib.com",
+      "category": "Tools",
+      "iconName": "Code2"
+    },
+    {
+      "id": "1785489456862",
+      "name": "Heroicons SVG",
+      "url": "https://heroicons.dev",
+      "category": "Tools",
+      "iconName": "Code2"
+    },
+    {
+      "id": "1785489696316",
+      "name": "Shadcn",
+      "url": "https://ui.shadcn.com",
+      "category": "Dev",
+      "iconName": "Flame"
+    },
+    {
+      "id": "1785491822511",
+      "name": "Lorem Ipsum",
+      "url": "https://www.lipsum.com",
+      "category": "Dev",
+      "iconName": "Code2"
+    },
+    {
+      "id": "1785491891142",
+      "name": "Icons8",
+      "url": "https://icons8.com/icons",
+      "category": "Tools",
+      "iconName": "Globe"
+    },
+    {
+      "id": "1785491916905",
+      "name": "Hex Color",
+      "url": "https://www.color-hex.com",
+      "category": "Tools",
+      "iconName": "BookOpen"
+    },
+    {
+      "id": "1785491954248",
+      "name": "Aceternity UI",
+      "url": "https://ui.aceternity.com",
+      "category": "Dev",
+      "iconName": "Flame"
+    },
+    {
+      "id": "1785491993211",
+      "name": "React Native Paper",
+      "url": "https://reactnativepaper.com",
+      "category": "Dev",
+      "iconName": "Code2"
+    },
+    {
+      "id": "1785492039815",
+      "name": "PDF - 2 - PNG",
+      "url": "https://pdf2png.com",
+      "category": "Tools",
+      "iconName": "Send"
+    },
+    {
+      "id": "1785492094705",
+      "name": "MD5 Hash Generator",
+      "url": "https://www.md5hashgenerator.com",
+      "category": "Tools",
+      "iconName": "Play"
+    },
+    {
+      "id": "1785492130525",
+      "name": "Color Meanings",
+      "url": "https://www.color-meanings.com",
+      "category": "Leisure",
+      "iconName": "Globe"
+    },
+    {
+      "id": "1785492151419",
+      "name": "Upscaler",
+      "url": "https://www.pixelcut.ai/image-upscaler",
+      "category": "Tools",
+      "iconName": "MessageSquare"
+    },
+    {
+      "id": "1785492182432",
+      "name": "Swup JS",
+      "url": "https://swup.js.org",
+      "category": "Dev",
+      "iconName": "Code2"
+    },
+    {
+      "id": "1785492215042",
+      "name": "GSAP ",
+      "url": "https://gsap.com/docs",
+      "category": "Dev",
+      "iconName": "Terminal"
+    },
+    {
+      "id": "1785492251475",
+      "name": "Capcut",
+      "url": "https://www.capcut.com/",
+      "category": "Social",
+      "iconName": "Play"
+    },
+    {
+      "id": "1785492275801",
+      "name": "RenderForest",
+      "url": "https://www.renderforest.com/#Videos",
+      "category": "Social",
+      "iconName": "Play"
+    },
+    {
+      "id": "1785492351752",
+      "name": "ManyTools",
+      "url": "https://manytools.org",
+      "category": "Tools",
+      "iconName": "Flame"
+    },
+    {
+      "id": "1785492374829",
+      "name": "TTS",
+      "url": "https://www.tetyys.com/SAPI4/",
+      "category": "Tools",
+      "iconName": "Tv"
+    },
+    {
+      "id": "1785492547500",
+      "name": "Infon",
+      "url": "https://infon.dividuum.de",
+      "category": "Leisure",
+      "iconName": "Globe"
+    },
+    {
+      "id": "1785492581491",
+      "name": "PNG Tuber",
+      "url": "https://kaiakairos.itch.io/pngtuber-plus",
+      "category": "Tools",
+      "iconName": "Globe"
+    },
+    {
+      "id": "1785492607032",
+      "name": "VeadoTube",
+      "url": "https://olmewe.itch.io/veadotube-mini",
+      "category": "Tools",
+      "iconName": "Globe"
+    },
+    {
+      "id": "1785492634912",
+      "name": "Cursed Text Generator",
+      "url": "https://lingojam.com/CursedText",
+      "category": "Dev",
+      "iconName": "MessageSquare"
+    },
+    {
+      "id": "1785492654019",
+      "name": "ScrollMagic",
+      "url": "https://scrollmagic.io",
+      "category": "Dev",
+      "iconName": "Terminal"
+    },
+    {
+      "id": "1785492673378",
+      "name": "Matter.js",
+      "url": "https://brm.io/matter-js/",
+      "category": "Dev",
+      "iconName": "Code2"
+    },
+    {
+      "id": "1785492739513",
+      "name": "Preact",
+      "url": "https://preactjs.com",
+      "category": "Dev",
+      "iconName": "Terminal"
+    },
+    {
+      "id": "1785492756697",
+      "name": "Expo Icons",
+      "url": "https://icons.expo.fyi/Index",
+      "category": "Tools",
+      "iconName": "Code2"
+    },
+    {
+      "id": "1785492777688",
+      "name": "FlowBite Reacts",
+      "url": "https://flowbite.com/#components",
+      "category": "Dev",
+      "iconName": "Code2"
+    },
+    {
+      "id": "1785492803064",
+      "name": "Photopea",
+      "url": "https://www.photopea.com",
+      "category": "Social",
+      "iconName": "Globe"
+    },
+    {
+      "id": "1785492918774",
+      "name": "Google Gemini",
+      "url": "https://gemini.google.com/",
+      "category": "Dev",
+      "iconName": "Globe"
+    },
+    {
+      "id": "1785492936522",
+      "name": "Unimap E-Learning",
+      "url": "https://elearning.unimap.edu.my/",
+      "category": "Academic",
+      "iconName": "GraduationCap"
+    },
+    {
+      "id": "1785492957169",
+      "name": "Google Notebook",
+      "url": "https://notebooklm.google/",
+      "category": "Academic",
+      "iconName": "MessageSquare"
+    },
+    {
+      "id": "1785492972845",
+      "name": "DSpace",
+      "url": "https://dspace.unimap.edu.my/home",
+      "category": "Academic",
+      "iconName": "GraduationCap"
+    },
+    {
+      "id": "1785493002421",
+      "name": "MATLAB Onramp",
+      "url": "https://matlabacademy.mathworks.com/details/matlab-onramp/gettingstarted",
+      "category": "Dev",
+      "iconName": "Code2"
+    },
+    {
+      "id": "1785493115047",
+      "name": "ChatGPT",
+      "url": "https://chat.openai.com/chat",
+      "category": "Dev",
+      "iconName": "Code2"
     }
   ],
   "scratchpad": "",
   "analytics": [],
-  "games": [
-    {
-      "id": "1",
-      "title": "Elden Ring",
-      "platform": "PC",
-      "status": "Completed",
-      "rating": "5/5"
-    }
-  ],
+  "games": [],
   "projects": [],
   "accounts": []
 }

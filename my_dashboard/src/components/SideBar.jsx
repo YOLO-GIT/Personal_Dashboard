@@ -104,7 +104,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
             <div className="relative z-10 flex-1 flex flex-col min-h-0 space-y-3 overflow-y-auto my_scroll pr-0.5">
                 {/* Brand / Header Link */}
                 <a
-                    href="https://github.com/your-username/your-dashboard-repo"
+                    href="https://github.com/YOLO-GIT/Personal_Dashboard.git"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="relative group flex items-center px-4 py-2.5 bg-[#161616] border border-gray-800/80 hover:border-emerald-500/50 rounded-xl transition-all duration-300 active:translate-y-0 cursor-pointer overflow-hidden shrink-0"
