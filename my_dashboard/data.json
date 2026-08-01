@@ -328,11 +328,134 @@
       "url": "https://chat.openai.com/chat",
       "category": "Dev",
       "iconName": "Code2"
+    },
+    {
+      "id": "1785494558060",
+      "name": "Google Account",
+      "url": "https://myaccount.google.com",
+      "category": "Social",
+      "iconName": "Globe"
+    },
+    {
+      "id": "1785495123398",
+      "name": "Proton Mail",
+      "url": "https://mail.proton.me/u/1/inbox",
+      "category": "Social",
+      "iconName": "Terminal"
+    },
+    {
+      "id": "1785498659058",
+      "name": "Free Malaysia Today",
+      "url": "https://www.freemalaysiatoday.com/",
+      "category": "Social",
+      "iconName": "Globe"
+    },
+    {
+      "id": "1785521544233",
+      "name": "LinkedIN",
+      "url": "https://www.linkedin.com/feed/",
+      "category": "Social",
+      "iconName": "GraduationCap"
+    },
+    {
+      "id": "1785597649642",
+      "name": "Freepik",
+      "url": "https://www.magnific.com/app",
+      "category": "Social",
+      "iconName": "BookOpen"
     }
   ],
   "scratchpad": "",
   "analytics": [],
   "games": [],
-  "projects": [],
-  "accounts": []
+  "projects": [
+    {
+      "name": "FYP",
+      "url": "https://github.com/YOLO-GIT/fyp.git",
+      "desc": "E-Library I build for my FInal Year Project",
+      "tech": "HTML, CSS, JS + PHP",
+      "id": "1785493741746"
+    },
+    {
+      "name": "Troll Web",
+      "url": "https://yolo-git.github.io/master/",
+      "desc": "Hobby Project I made for friend.",
+      "tech": "Vanilla + React",
+      "id": "1785493804701"
+    },
+    {
+      "name": "Raya",
+      "url": "https://yolo-git.github.io/Raya/",
+      "desc": "Cute ahh template.",
+      "tech": "Vanilla + React + GSAP",
+      "id": "1785493866156"
+    },
+    {
+      "name": "Intern Archive",
+      "url": "https://github.com/YOLO-GIT/intern-stuff",
+      "desc": "Archive I made to store my intern past as a proof.",
+      "tech": "Vite + React, Tailwind CSS",
+      "id": "1785493959403"
+    },
+    {
+      "name": "Puasa (2024)",
+      "url": "https://yolo-git.github.io/Puasa/",
+      "desc": "Simple web I made using parallax and react.",
+      "tech": "Vanilla + TailwindCSS",
+      "id": "1785494042802"
+    },
+    {
+      "name": "Raya (2026)",
+      "url": "https://yolo-git.github.io/Raya-2026/",
+      "desc": "New style and improved knowledge about template.",
+      "tech": "Vite + React",
+      "id": "1785494125900"
+    },
+    {
+      "name": "Ball Collision Analyzer",
+      "url": "https://yolo-git.github.io/eng_portfolio/",
+      "desc": "To analyze ball collision based.",
+      "tech": "Vite + React + Matter.JS + Vanilla JS",
+      "id": "1785494258826"
+    },
+    {
+      "name": "Circuits Theory",
+      "url": "https://yolo-git.github.io/circuits_theory/",
+      "desc": "Web I made about the basic fundamental of circuits and gates.",
+      "tech": "Vanilla JS + Vite + React",
+      "id": "1785494322288"
+    }
+  ],
+  "accounts": [
+    {
+      "platform": "Youtube",
+      "identifier": "Sufi (YOLO-GIT) @ahmadsufi4367",
+      "category": "YT",
+      "id": "1785494936334"
+    },
+    {
+      "platform": "Youtube",
+      "identifier": "Adam Spencer",
+      "category": "2nd Youtube Account",
+      "id": "1785494992585"
+    },
+    {
+      "platform": "Proton Mail",
+      "identifier": "realdavid435x3",
+      "category": "Secret",
+      "id": "1785495133088"
+    },
+    {
+      "platform": "LinkedIN",
+      "identifier": "ahmadsufi345gmail.com",
+      "category": "General",
+      "id": "1785596603501"
+    },
+    {
+      "platform": "ChatGPT",
+      "identifier": "alexandriad431@gmail.com",
+      "category": "AI",
+      "id": "1785604544726"
+    }
+  ]
 }
