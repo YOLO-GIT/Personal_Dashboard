@@ -12,6 +12,8 @@ dist
 dist-ssr
 data.json
 launcher.bat
+launch.vbs
+backup_1.txt
 server.js
 *.local
 
