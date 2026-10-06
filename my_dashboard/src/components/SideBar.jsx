@@ -1,78 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import AmbientPlayer from "./AmbientPlayer";
 import {
     Home,
     BarChart3,
-    Timer,
     User,
-    Play,
-    Pause,
-    RotateCcw,
     Activity,
     Code2,
     Wifi,
 } from "lucide-react";
 
-// List of background GIFs to rotate through
-const BACKGROUND_GIFS = [
-    "/dashy_4.gif",
-    "/dashy_2.gif",
-    "/dashy_5.gif",
-    "/dashy_6.gif",
-    "/dashy_7.gif",
-];
-
 export default function Sidebar({ activeTab, setActiveTab }) {
-    // --- Dynamic GIF Rotator State ---
-    const [currentGifIndex, setCurrentGifIndex] = useState(0);
-
-    useEffect(() => {
-        // Rotates the background GIF every 30 seconds
-        const timer = setInterval(() => {
-            setCurrentGifIndex((prev) => (prev + 1) % BACKGROUND_GIFS.length);
-        }, 30000);
-
-        return () => clearInterval(timer);
-    }, []);
-
-    // --- Pomodoro Timer State ---
-    const [timeLeft, setTimeLeft] = useState(25 * 60);
-    const [isRunning, setIsRunning] = useState(false);
-    const [mode, setMode] = useState("work"); // 'work' or 'break'
-
-    useEffect(() => {
-        let interval = null;
-        if (isRunning && timeLeft > 0) {
-            interval = setInterval(() => {
-                setTimeLeft((prev) => prev - 1);
-            }, 1000);
-        } else if (timeLeft === 0) {
-            setIsRunning(false);
-            if (mode === "work") {
-                setMode("break");
-                setTimeLeft(5 * 60);
-                alert("Focus session completed! Take a 5-minute break.");
-            } else {
-                setMode("work");
-                setTimeLeft(25 * 60);
-                alert("Break is over! Time to focus.");
-            }
-        }
-        return () => clearInterval(interval);
-    }, [isRunning, timeLeft, mode]);
-
-    const toggleTimer = () => setIsRunning(!isRunning);
-    const resetTimer = () => {
-        setIsRunning(false);
-        setTimeLeft(mode === "work" ? 25 * 60 : 5 * 60);
-    };
-
-    const formatTime = (seconds) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-    };
-
     // --- Quick Stats Readout ---
     const logs = JSON.parse(localStorage.getItem("dashboard_analytics")) || [];
     const todayStr = new Date().toDateString();
@@ -82,21 +19,6 @@ export default function Sidebar({ activeTab, setActiveTab }) {
 
     return (
         <aside className="relative w-64 p-5 bg-[#0a0a0a] flex flex-col justify-between shrink-0 border-r border-gray-900/80 h-screen top-0 overflow-hidden select-none">
-            {BACKGROUND_GIFS.map((gifPath, index) => (
-                <img
-                    key={gifPath}
-                    src={gifPath}
-                    alt=""
-                    className={`absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-1000 ${index === currentGifIndex
-                        ? "opacity-30 scale-100"
-                        : "opacity-0 scale-105"
-                        }`}
-                    onError={(e) => {
-                        e.target.style.display = "none";
-                    }}
-                />
-            ))}
-
             {/* Subtle Gradient Mask for Text Contrast */}
             <div className="absolute inset-0 bg-linear-to-b from-[#0a0a0a]/85 via-[#0a0a0a]/60 to-[#0a0a0a]/90 pointer-events-none" />
 
@@ -163,49 +85,6 @@ export default function Sidebar({ activeTab, setActiveTab }) {
 
                 {/* Widgets Container */}
                 <div className="space-y-2.5 pt-0.5">
-                    {/* Pomodoro Timer Widget */}
-                    <div className="bg-[#121212]/70 backdrop-blur-md border border-white/10 rounded-xl p-3 space-y-2 shadow-lg">
-                        <div className="flex items-center justify-between text-[11px] text-gray-400 font-medium">
-                            <span className="flex items-center gap-1.5 text-emerald-400 font-bold uppercase tracking-wider text-[9px]">
-                                <Timer className="w-3 h-3" />{" "}
-                                {mode === "work" ? "Focus Session" : "Break Time"}
-                            </span>
-                            <span className="text-[9px] text-gray-400 font-mono">
-                                {mode === "work" ? "25m" : "5m"}
-                            </span>
-                        </div>
-
-                        <div className="text-center py-0">
-                            <div className="text-2xl font-mono font-extrabold text-white tracking-widest drop-shadow-sm">
-                                {formatTime(timeLeft)}
-                            </div>
-                        </div>
-
-                        <div className="flex justify-center gap-1.5">
-                            <button
-                                onClick={toggleTimer}
-                                className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[11px] font-bold transition ${isRunning
-                                    ? "bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 border border-amber-500/30"
-                                    : "bg-emerald-600/90 text-white hover:bg-emerald-500 border border-emerald-500/30 shadow-md"
-                                    }`}
-                            >
-                                {isRunning ? (
-                                    <Pause className="w-3 h-3" />
-                                ) : (
-                                    <Play className="w-3 h-3" />
-                                )}
-                                {isRunning ? "Pause" : "Start"}
-                            </button>
-                            <button
-                                onClick={resetTimer}
-                                className="p-1.5 text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg border border-white/5 transition"
-                                title="Reset Timer"
-                            >
-                                <RotateCcw className="w-3 h-3" />
-                            </button>
-                        </div>
-                    </div>
-
                     {/* Ambient Sound Player */}
                     <div className="bg-[#121212]/70 backdrop-blur-md border border-white/10 rounded-xl p-1 shadow-lg">
                         <AmbientPlayer />
