@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { loadDashboardData, syncDashboardData } from '../api';
 import {
     Gamepad2, Globe, UserCheck, Plus, Trash2, ExternalLink,
-    ShieldAlert, Copy, Check, Search, Star, Sparkles, Code2, ShieldCheck
+    Copy, Check, Search, Star, Sparkles, Code2, ShieldCheck,
+    Eye, EyeOff, Lock, Pencil, X, Save
 } from 'lucide-react';
 
 // Platform Theme Helper for Account Cards
@@ -30,17 +31,22 @@ const getGameStatusTheme = (status) => {
 export default function PersonalHub() {
     const [subTab, setSubTab] = useState('games'); // 'games' | 'projects' | 'accounts'
     const [searchQuery, setSearchQuery] = useState('');
-    const [copiedId, setCopiedId] = useState(null);
+    const [copiedKey, setCopiedKey] = useState(null);
+    const [visiblePasswords, setVisiblePasswords] = useState({});
 
     // States
     const [games, setGames] = useState([]);
     const [projects, setProjects] = useState([]);
     const [accounts, setAccounts] = useState([]);
 
+    // Account Editing State
+    const [editingAccountId, setEditingAccountId] = useState(null);
+    const [editAccountData, setEditAccountData] = useState({ platform: '', identifier: '', password: '', category: '' });
+
     // Form Inputs
     const [newGame, setNewGame] = useState({ title: '', platform: 'PC', status: 'Playing', rating: '5' });
     const [newProject, setNewProject] = useState({ name: '', url: '', desc: '', tech: '' });
-    const [newAccount, setNewAccount] = useState({ platform: '', identifier: '', category: 'General' });
+    const [newAccount, setNewAccount] = useState({ platform: '', identifier: '', password: '', category: 'General' });
 
     // Load Initial Data from Backend
     useEffect(() => {
@@ -92,7 +98,7 @@ export default function PersonalHub() {
         const updated = [...accounts, { ...newAccount, id: Date.now().toString() }];
         setAccounts(updated);
         syncDashboardData({ accounts: updated });
-        setNewAccount({ platform: '', identifier: '', category: 'General' });
+        setNewAccount({ platform: '', identifier: '', password: '', category: 'General' });
     };
 
     const deleteAccount = (id) => {
@@ -101,10 +107,38 @@ export default function PersonalHub() {
         syncDashboardData({ accounts: updated });
     };
 
-    const handleCopy = (text, id) => {
+    // Account Edit Handlers
+    const startEditingAccount = (account) => {
+        setEditingAccountId(account.id);
+        setEditAccountData({
+            platform: account.platform || '',
+            identifier: account.identifier || '',
+            password: account.password || '',
+            category: account.category || 'General'
+        });
+    };
+
+    const cancelEditAccount = () => {
+        setEditingAccountId(null);
+        setEditAccountData({ platform: '', identifier: '', password: '', category: '' });
+    };
+
+    const saveEditedAccount = (id) => {
+        if (!editAccountData.platform || !editAccountData.identifier) return;
+        const updated = accounts.map((a) => (a.id === id ? { ...a, ...editAccountData } : a));
+        setAccounts(updated);
+        syncDashboardData({ accounts: updated });
+        setEditingAccountId(null);
+    };
+
+    const handleCopy = (text, key) => {
         navigator.clipboard.writeText(text);
-        setCopiedId(id);
-        setTimeout(() => setCopiedId(null), 2000);
+        setCopiedKey(key);
+        setTimeout(() => setCopiedKey(null), 2000);
+    };
+
+    const togglePasswordVisibility = (id) => {
+        setVisiblePasswords((prev) => ({ ...prev, [id]: !prev[id] }));
     };
 
     const getFaviconUrl = (url) => {
@@ -119,7 +153,11 @@ export default function PersonalHub() {
     // Filtered Lists
     const filteredGames = games.filter(g => g.title.toLowerCase().includes(searchQuery.toLowerCase()));
     const filteredProjects = projects.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    const filteredAccounts = accounts.filter(a => a.platform.toLowerCase().includes(searchQuery.toLowerCase()) || a.identifier.toLowerCase().includes(searchQuery.toLowerCase()));
+    const filteredAccounts = accounts.filter(a =>
+        a.platform.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        a.identifier.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        a.category.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     // Derived Stats
     const completedGamesCount = games.filter(g => g.status === 'Completed').length;
@@ -176,7 +214,6 @@ export default function PersonalHub() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
-                    {/* Search Box */}
                     <div className="relative">
                         <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-500" />
                         <input
@@ -188,26 +225,22 @@ export default function PersonalHub() {
                         />
                     </div>
 
-                    {/* Sub-Tabs Selector */}
                     <div className="flex bg-[#161616] p-1 rounded-xl border border-gray-800/80 shadow-inner">
                         <button
                             onClick={() => setSubTab('games')}
-                            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${subTab === 'games' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-400 hover:text-white'
-                                }`}
+                            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${subTab === 'games' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-400 hover:text-white'}`}
                         >
                             <Gamepad2 className="w-3.5 h-3.5" /> Games ({games.length})
                         </button>
                         <button
                             onClick={() => setSubTab('projects')}
-                            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${subTab === 'projects' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-400 hover:text-white'
-                                }`}
+                            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${subTab === 'projects' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-400 hover:text-white'}`}
                         >
                             <Globe className="w-3.5 h-3.5" /> Web Pages ({projects.length})
                         </button>
                         <button
                             onClick={() => setSubTab('accounts')}
-                            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${subTab === 'accounts' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-400 hover:text-white'
-                                }`}
+                            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${subTab === 'accounts' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-400 hover:text-white'}`}
                         >
                             <UserCheck className="w-3.5 h-3.5" /> Accounts ({accounts.length})
                         </button>
@@ -283,7 +316,6 @@ export default function PersonalHub() {
                                             </div>
                                         </div>
 
-                                        {/* Vector Star Rating Visualizer */}
                                         <div className="flex items-center gap-1 pt-1">
                                             {Array.from({ length: 5 }).map((_, i) => (
                                                 <Star
@@ -361,7 +393,6 @@ export default function PersonalHub() {
                                 >
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-3">
-                                            {/* Favicon Container */}
                                             <div className="p-2 bg-[#101010] border border-gray-800 rounded-xl group-hover:scale-110 transition-transform shrink-0">
                                                 {favicon ? (
                                                     <img src={favicon} alt="" className="w-5 h-5 rounded" onError={(e) => e.target.style.display = 'none'} />
@@ -406,12 +437,12 @@ export default function PersonalHub() {
                 </div>
             )}
 
-            {/* --- SUB-TAB 3: ACCOUNTS DIRECTORY --- */}
+            {/* --- SUB-TAB 3: ACCOUNTS DIRECTORY & VAULT --- */}
             {subTab === 'accounts' && (
                 <div className="space-y-6">
-                    <div className="bg-amber-950/20 border border-amber-800/40 rounded-2xl p-3.5 flex items-center gap-3 text-amber-400 text-xs shadow-inner">
-                        <ShieldCheck className="w-5 h-5 shrink-0 text-amber-400" />
-                        <span>Store public IDs, gamer tags, and dev usernames safely here. Keep passwords in a password manager!</span>
+                    <div className="bg-emerald-950/20 border border-emerald-800/40 rounded-2xl p-3.5 flex items-center gap-3 text-emerald-400 text-xs shadow-inner">
+                        <ShieldCheck className="w-5 h-5 shrink-0 text-emerald-400" />
+                        <span>Safely organize public IDs, dev usernames, and passwords. Passwords stay hidden by default and are visible only when toggled.</span>
                     </div>
 
                     <form onSubmit={addAccount} className="bg-[#161616] border border-gray-800/80 rounded-2xl p-4 flex flex-wrap gap-3 items-center shadow-lg">
@@ -420,23 +451,30 @@ export default function PersonalHub() {
                             placeholder="Platform (e.g. Discord, Steam)"
                             value={newAccount.platform}
                             onChange={(e) => setNewAccount({ ...newAccount, platform: e.target.value })}
-                            className="bg-[#101010] border border-gray-800 px-3.5 py-2 rounded-xl text-xs text-white flex-1 min-w-40 focus:outline-none focus:border-emerald-500"
+                            className="bg-[#101010] border border-gray-800 px-3.5 py-2 rounded-xl text-xs text-white flex-1 min-w-36 focus:outline-none focus:border-emerald-500"
                             required
                         />
                         <input
                             type="text"
-                            placeholder="Username / Tag / Email"
+                            placeholder="Username / Email"
                             value={newAccount.identifier}
                             onChange={(e) => setNewAccount({ ...newAccount, identifier: e.target.value })}
-                            className="bg-[#101010] border border-gray-800 px-3.5 py-2 rounded-xl text-xs text-white flex-1 min-w-45 focus:outline-none focus:border-emerald-500"
+                            className="bg-[#101010] border border-gray-800 px-3.5 py-2 rounded-xl text-xs text-white flex-1 min-w-40 focus:outline-none focus:border-emerald-500"
                             required
+                        />
+                        <input
+                            type="password"
+                            placeholder="Password (Optional)"
+                            value={newAccount.password}
+                            onChange={(e) => setNewAccount({ ...newAccount, password: e.target.value })}
+                            className="bg-[#101010] border border-gray-800 px-3.5 py-2 rounded-xl text-xs text-white flex-1 min-w-36 focus:outline-none focus:border-emerald-500"
                         />
                         <input
                             type="text"
                             placeholder="Category (Gaming, Dev)"
                             value={newAccount.category}
                             onChange={(e) => setNewAccount({ ...newAccount, category: e.target.value })}
-                            className="bg-[#101010] border border-gray-800 px-3.5 py-2 rounded-xl text-xs text-white w-32 focus:outline-none focus:border-emerald-500"
+                            className="bg-[#101010] border border-gray-800 px-3.5 py-2 rounded-xl text-xs text-white w-28 focus:outline-none focus:border-emerald-500"
                         />
                         <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-1 transition shadow-lg shadow-emerald-950/50">
                             <Plus className="w-4 h-4" /> Save Account
@@ -446,42 +484,153 @@ export default function PersonalHub() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                         {filteredAccounts.map((a) => {
                             const theme = getAccountTheme(a.platform);
+                            const isPasswordShown = !!visiblePasswords[a.id];
+                            const isEditing = editingAccountId === a.id;
+
+                            if (isEditing) {
+                                return (
+                                    <div
+                                        key={a.id}
+                                        className="bg-[#161616] border border-emerald-500/50 rounded-2xl p-5 space-y-3 shadow-lg"
+                                    >
+                                        <div className="flex justify-between items-center pb-2 border-b border-gray-800">
+                                            <span className="text-xs font-bold text-emerald-400">Edit Account</span>
+                                            <button onClick={cancelEditAccount} className="text-gray-400 hover:text-white">
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <input
+                                                type="text"
+                                                value={editAccountData.platform}
+                                                onChange={(e) => setEditAccountData({ ...editAccountData, platform: e.target.value })}
+                                                className="bg-[#101010] border border-gray-800 text-xs text-white p-2 rounded-lg focus:outline-none focus:border-emerald-500"
+                                                placeholder="Platform"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={editAccountData.category}
+                                                onChange={(e) => setEditAccountData({ ...editAccountData, category: e.target.value })}
+                                                className="bg-[#101010] border border-gray-800 text-xs text-white p-2 rounded-lg focus:outline-none focus:border-emerald-500"
+                                                placeholder="Category"
+                                            />
+                                        </div>
+
+                                        <input
+                                            type="text"
+                                            value={editAccountData.identifier}
+                                            onChange={(e) => setEditAccountData({ ...editAccountData, identifier: e.target.value })}
+                                            className="w-full bg-[#101010] border border-gray-800 text-xs text-white p-2 rounded-lg focus:outline-none focus:border-emerald-500"
+                                            placeholder="Username / Email"
+                                        />
+
+                                        <input
+                                            type="text"
+                                            value={editAccountData.password}
+                                            onChange={(e) => setEditAccountData({ ...editAccountData, password: e.target.value })}
+                                            className="w-full bg-[#101010] border border-gray-800 text-xs text-white p-2 rounded-lg focus:outline-none focus:border-emerald-500"
+                                            placeholder="Password (Optional)"
+                                        />
+
+                                        <div className="flex justify-end gap-2 pt-2">
+                                            <button
+                                                onClick={cancelEditAccount}
+                                                className="px-3 py-1.5 text-xs text-gray-400 hover:text-white rounded-lg border border-gray-800 hover:bg-gray-800 transition"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={() => saveEditedAccount(a.id)}
+                                                className="px-3 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold flex items-center gap-1 transition shadow-md"
+                                            >
+                                                <Save className="w-3.5 h-3.5" /> Save Changes
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            }
 
                             return (
                                 <div
                                     key={a.id}
-                                    className={`bg-[#161616] bg-linear-to-r ${theme.gradient} border border-gray-800/80 ${theme.border} rounded-2xl p-5 flex justify-between items-center transition-all duration-300 hover:-translate-y-1 shadow-lg group`}
+                                    className={`bg-[#161616] bg-linear-to-r ${theme.gradient} border border-gray-800/80 ${theme.border} rounded-2xl p-5 flex justify-between items-start transition-all duration-300 hover:-translate-y-1 shadow-lg group`}
                                 >
-                                    <div className="space-y-1.5">
+                                    <div className="space-y-2">
                                         <span className="text-[9px] uppercase font-mono font-bold text-gray-400 tracking-widest">{a.category}</span>
                                         <h4 className="font-bold text-white text-lg tracking-wide group-hover:text-white transition">{a.platform}</h4>
 
-                                        {/* Copy Handle Pill */}
+                                        {/* Username Pill */}
                                         <div className="flex items-center gap-2 pt-1">
                                             <span className="text-xs text-gray-200 font-mono bg-[#101010] px-3 py-1 rounded-lg border border-gray-800 shadow-inner">
                                                 {a.identifier}
                                             </span>
                                             <button
-                                                onClick={() => handleCopy(a.identifier, a.id)}
+                                                type="button"
+                                                onClick={() => handleCopy(a.identifier, `${a.id}-user`)}
                                                 className="text-gray-500 hover:text-emerald-400 transition p-1"
-                                                title="Copy to clipboard"
+                                                title="Copy Username"
                                             >
-                                                {copiedId === a.id ? (
+                                                {copiedKey === `${a.id}-user` ? (
                                                     <Check className="w-4 h-4 text-emerald-400 animate-bounce" />
                                                 ) : (
                                                     <Copy className="w-4 h-4" />
                                                 )}
                                             </button>
                                         </div>
+
+                                        {/* Safe Password Pill */}
+                                        {a.password && (
+                                            <div className="flex items-center gap-2 pt-0.5">
+                                                <div className="flex items-center gap-1.5 bg-[#101010] px-3 py-1 rounded-lg border border-gray-800 shadow-inner text-xs font-mono text-amber-300">
+                                                    <Lock className="w-3 h-3 text-amber-400/80 shrink-0" />
+                                                    <span>{isPasswordShown ? a.password : '••••••••'}</span>
+                                                </div>
+
+                                                {/* Toggle Password Visibility */}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => togglePasswordVisibility(a.id)}
+                                                    className="text-gray-500 hover:text-amber-400 transition p-1"
+                                                    title={isPasswordShown ? "Hide Password" : "Show Password"}
+                                                >
+                                                    {isPasswordShown ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                </button>
+
+                                                {/* Copy Password */}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleCopy(a.password, `${a.id}-pass`)}
+                                                    className="text-gray-500 hover:text-emerald-400 transition p-1"
+                                                    title="Copy Password"
+                                                >
+                                                    {copiedKey === `${a.id}-pass` ? (
+                                                        <Check className="w-4 h-4 text-emerald-400 animate-bounce" />
+                                                    ) : (
+                                                        <Copy className="w-4 h-4" />
+                                                    )}
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
 
-                                    <button
-                                        onClick={() => deleteAccount(a.id)}
-                                        className="text-gray-600 hover:text-red-400 transition p-1.5 rounded-lg hover:bg-red-950/40"
-                                        title="Delete Account"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </button>
+                                    {/* Action Buttons: Edit & Delete */}
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            onClick={() => startEditingAccount(a)}
+                                            className="text-gray-600 hover:text-emerald-400 transition p-1.5 rounded-lg hover:bg-emerald-950/40"
+                                            title="Edit Account"
+                                        >
+                                            <Pencil className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => deleteAccount(a.id)}
+                                            className="text-gray-600 hover:text-red-400 transition p-1.5 rounded-lg hover:bg-red-950/40"
+                                            title="Delete Account"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
                                 </div>
                             );
                         })}
