@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import ShortcutCard from './components/ShortcutCards';
 import AddShortcutModal from './components/AddShortCutsModal';
 import AnalyticsView from './components/AnalyticsView';
@@ -13,6 +13,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState(''); // State for search input
   const [shortcuts, setShortcuts] = useState([]);
 
   // Load server data on boot
@@ -38,15 +39,32 @@ export default function App() {
     updateShortcuts(shortcuts.filter((s) => s.id !== id));
   };
 
+  // Toggle pinned status for a shortcut
+  const handleTogglePin = (id) => {
+    const updated = shortcuts.map((s) =>
+      s.id === id ? { ...s, isPinned: !s.isPinned } : s
+    );
+    updateShortcuts(updated);
+  };
+
   const categories = useMemo(() => {
     const unique = new Set(shortcuts.map((s) => s.category));
     return ['All', ...Array.from(unique)];
   }, [shortcuts]);
 
+  // Filter by category + search query, and sort pinned items to the top
   const filteredShortcuts = useMemo(() => {
-    if (selectedCategory === 'All') return shortcuts;
-    return shortcuts.filter((s) => s.category === selectedCategory);
-  }, [shortcuts, selectedCategory]);
+    return shortcuts
+      .filter((s) => {
+        const matchesCategory =
+          selectedCategory === 'All' || s.category === selectedCategory;
+        const matchesSearch =
+          (s.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (s.category || '').toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+      })
+      .sort((a, b) => Number(Boolean(b.isPinned)) - Number(Boolean(a.isPinned)));
+  }, [shortcuts, selectedCategory, searchQuery]);
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-black text-white">
@@ -57,14 +75,30 @@ export default function App() {
           <div>
             <Header />
 
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
               <h3 className="text-xl font-bold text-white">Shortcuts</h3>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm rounded-xl transition"
-              >
-                Add Shortcut
-              </button>
+
+              {/* Search Bar & Add Button */}
+              <div className="flex items-center gap-3">
+                <div className="relative flex-1 sm:w-64">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search shortcuts..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-[#1A1A1A] text-sm text-white placeholder-gray-500 rounded-xl pl-9 pr-4 py-2 border border-gray-800 focus:outline-none focus:border-emerald-500 transition"
+                  />
+                </div>
+
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm rounded-xl transition whitespace-nowrap"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Shortcut
+                </button>
+              </div>
             </div>
 
             <div className="flex flex-wrap gap-2 mb-6">
@@ -88,6 +122,7 @@ export default function App() {
                   key={shortcut.id}
                   {...shortcut}
                   onDelete={handleDeleteShortcut}
+                  onTogglePin={handleTogglePin}
                 />
               ))}
 
