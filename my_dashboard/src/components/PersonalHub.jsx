@@ -554,21 +554,26 @@ export default function PersonalHub() {
                             return (
                                 <div
                                     key={a.id}
-                                    className={`bg-[#161616] bg-linear-to-r ${theme.gradient} border border-gray-800/80 ${theme.border} rounded-2xl p-5 flex justify-between items-start transition-all duration-300 hover:-translate-y-1 shadow-lg group`}
+                                    className={`bg-[#161616] bg-linear-to-r ${theme.gradient} border border-gray-800/80 ${theme.border} rounded-2xl p-5 flex justify-between items-start gap-3 transition-all duration-300 hover:-translate-y-1 shadow-lg group`}
                                 >
-                                    <div className="space-y-2">
-                                        <span className="text-[9px] uppercase font-mono font-bold text-gray-400 tracking-widest">{a.category}</span>
-                                        <h4 className="font-bold text-white text-lg tracking-wide group-hover:text-white transition">{a.platform}</h4>
+                                    {/* Left Content Column (flex-1 min-w-0 prevents text from pushing card boundaries) */}
+                                    <div className="space-y-2 flex-1 min-w-0">
+                                        <span className="text-[9px] uppercase font-mono font-bold text-gray-400 tracking-widest block truncate">
+                                            {a.category}
+                                        </span>
+                                        <h4 className="font-bold text-white text-lg tracking-wide group-hover:text-white transition truncate">
+                                            {a.platform}
+                                        </h4>
 
                                         {/* Username Pill */}
-                                        <div className="flex items-center gap-2 pt-1">
-                                            <span className="text-xs text-gray-200 font-mono bg-[#101010] px-3 py-1 rounded-lg border border-gray-800 shadow-inner">
+                                        <div className="flex items-center gap-2 pt-1 max-w-full">
+                                            <span className="text-xs text-gray-200 font-mono bg-[#101010] px-3 py-1 rounded-lg border border-gray-800 shadow-inner truncate max-w-[85%]">
                                                 {a.identifier}
                                             </span>
                                             <button
                                                 type="button"
                                                 onClick={() => handleCopy(a.identifier, `${a.id}-user`)}
-                                                className="text-gray-500 hover:text-emerald-400 transition p-1"
+                                                className="text-gray-500 hover:text-emerald-400 transition p-1 shrink-0"
                                                 title="Copy Username"
                                             >
                                                 {copiedKey === `${a.id}-user` ? (
@@ -581,17 +586,17 @@ export default function PersonalHub() {
 
                                         {/* Safe Password Pill */}
                                         {a.password && (
-                                            <div className="flex items-center gap-2 pt-0.5">
-                                                <div className="flex items-center gap-1.5 bg-[#101010] px-3 py-1 rounded-lg border border-gray-800 shadow-inner text-xs font-mono text-amber-300">
+                                            <div className="flex items-center gap-2 pt-0.5 max-w-full">
+                                                <div className="flex items-center gap-1.5 bg-[#101010] px-3 py-1 rounded-lg border border-gray-800 shadow-inner text-xs font-mono text-amber-300 max-w-[70%]">
                                                     <Lock className="w-3 h-3 text-amber-400/80 shrink-0" />
-                                                    <span>{isPasswordShown ? a.password : '••••••••'}</span>
+                                                    <span className="truncate">{isPasswordShown ? a.password : '••••••••'}</span>
                                                 </div>
 
                                                 {/* Toggle Password Visibility */}
                                                 <button
                                                     type="button"
                                                     onClick={() => togglePasswordVisibility(a.id)}
-                                                    className="text-gray-500 hover:text-amber-400 transition p-1"
+                                                    className="text-gray-500 hover:text-amber-400 transition p-1 shrink-0"
                                                     title={isPasswordShown ? "Hide Password" : "Show Password"}
                                                 >
                                                     {isPasswordShown ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -601,7 +606,7 @@ export default function PersonalHub() {
                                                 <button
                                                     type="button"
                                                     onClick={() => handleCopy(a.password, `${a.id}-pass`)}
-                                                    className="text-gray-500 hover:text-emerald-400 transition p-1"
+                                                    className="text-gray-500 hover:text-emerald-400 transition p-1 shrink-0"
                                                     title="Copy Password"
                                                 >
                                                     {copiedKey === `${a.id}-pass` ? (
@@ -614,8 +619,8 @@ export default function PersonalHub() {
                                         )}
                                     </div>
 
-                                    {/* Action Buttons: Edit & Delete */}
-                                    <div className="flex items-center gap-1">
+                                    {/* Action Buttons: Edit & Delete (shrink-0 prevents them from getting pushed out) */}
+                                    <div className="flex items-center gap-1 shrink-0">
                                         <button
                                             onClick={() => startEditingAccount(a)}
                                             className="text-gray-600 hover:text-emerald-400 transition p-1.5 rounded-lg hover:bg-emerald-950/40"
